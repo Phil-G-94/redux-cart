@@ -5,7 +5,11 @@ import Notification from "./components/UI/Notification";
 
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { notificationActions } from "./store/notification-slice";
+// import { notificationActions } from "./store/notification-slice";
+
+// import sendCartData() 'thunk' from cart-slice.js
+
+import { fetchCartData, sendCartData } from "./store/cart-actions";
 
 let isInitial = true;
 
@@ -20,50 +24,20 @@ function App() {
         (state) => state.notification.notification
     );
 
-    console.log(notification); // return notification object
+    useEffect(() => {
+        dispatch(fetchCartData());
+    }, [dispatch]);
 
     useEffect(() => {
-        const sendCartData = async () => {
-            dispatch(
-                notificationActions.showNotification({
-                    status: "pending",
-                    title: "Sending...",
-                    message: "Sending cart data...",
-                })
-            );
-
-            const response = await fetch(
-                "https://redux-shopping-app-f59dd-default-rtdb.europe-west1.firebasedatabase.app/cart.json",
-                { method: "PUT", body: JSON.stringify(cart) }
-            );
-
-            if (!response.ok) {
-                throw new Error("Sending cart data failed.");
-            }
-
-            dispatch(
-                notificationActions.showNotification({
-                    status: "success",
-                    title: "Success!",
-                    message: "Sent cart data successfully",
-                })
-            );
-        };
-
         if (isInitial) {
             isInitial = false;
             return;
         }
 
-        sendCartData().catch(() => {
-            dispatch(
-                notificationActions.showNotification({
-                    status: "error",
-                    title: "Error!",
-                    message: "Sending cart data failed",
-                })
-            );
-        });
+        if (cart.changed) {
+            // dispatch 'thunk' passing cart as argument
+            dispatch(sendCartData(cart));
+        }
     }, [cart, dispatch]);
 
     return (

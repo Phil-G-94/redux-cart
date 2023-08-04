@@ -1,3 +1,5 @@
+
+
 import { createSlice } from "@reduxjs/toolkit";
 
 const cartSlice = createSlice({
@@ -9,11 +11,17 @@ const cartSlice = createSlice({
     initialState: {
         items: [],
         totalQuantity: 0,
+        changed: false,
     },
 
     // reducers
 
     reducers: {
+        replaceCart(state, action) {
+            state.totalQuantity = action.payload.totalQuantity;
+            state.items = action.payload.items;
+        },
+
         addItemToCart(state, action) {
             const newItem = action.payload;
 
@@ -22,6 +30,8 @@ const cartSlice = createSlice({
             );
 
             state.totalQuantity++;
+
+            state.changed = true;
 
             if (!existingItem) {
                 state.items.push({
@@ -45,6 +55,8 @@ const cartSlice = createSlice({
 
             state.totalQuantity--;
 
+            state.changed = true;
+
             if (existingItem.quantity === 1) {
                 state.items = state.items.filter((item) => item.id !== id);
             } else {
@@ -62,6 +74,54 @@ const cartSlice = createSlice({
     },
 });
 
+
+
 export const cartActions = cartSlice.actions;
 
-export default cartSlice.reducer;
+export default cartSlice; // was cartSlice.reducer
+
+
+/*
+
+
+const sendCartData = async () => {
+            
+        dispatch(
+          notificationActions.showNotification({
+               status: "pending",
+            //         title: "Sending...",
+            //         message: "Sending cart data...",
+            //     })
+            // );
+            // const response = await fetch(
+            //     "https://redux-shopping-app-f59dd-default-rtdb.europe-west1.firebasedatabase.app/cart.json",
+            //     { method: "PUT", body: JSON.stringify(cart) }
+            // );
+            // if (!response.ok) {
+            //     throw new Error("Sending cart data failed.");
+            // }
+            // dispatch(
+            //     notificationActions.showNotification({
+            //         status: "success",
+            //         title: "Success!",
+            //         message: "Sent cart data successfully",
+            //     })
+            // );
+        };
+
+       
+
+        // sendCartData().catch(() => {
+        //     dispatch(
+        //         notificationActions.showNotification({
+        //             status: "error",
+        //             title: "Error!",
+        //             message: "Sending cart data failed",
+        //         })
+        //     );
+        // });
+
+
+
+
+*/ 
